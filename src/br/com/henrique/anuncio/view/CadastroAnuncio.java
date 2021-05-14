@@ -5,57 +5,15 @@ import br.com.henrique.anuncio.model.Anuncio;
 import java.awt.Color;
 import java.sql.*;
 import java.time.LocalDate;
-import net.proteanit.sql.DbUtils;
 
 public class CadastroAnuncio extends javax.swing.JFrame {
-
-    static Anuncio anuncio = new Anuncio();
-    static Connection conexao = null;
-    static PreparedStatement pst = null;
-    static ResultSet rs = null;
     
-    /***
-     * <h1>Inserir os dados no banco.</h1>
-     * 
-     * <p>Insere os dados do {@link Anuncio} no banco de dados</p>
-     * @author Henrique
-     */
-    public static void inserirDados() {
-        String sql = "insert into anuncios (nome, cliente, data_inicio, data_fim, investimento_dia)"
-            + " values ('" + anuncio.getNome() + "', '" + anuncio.getCliente() + "', '"
-            + anuncio.getDataInicio().toString() + "', '"
-            + anuncio.getDataFim().toString() + "', "
-            + anuncio.getInvestimentoDia() + ")";
-        try {
-            pst = conexao.prepareStatement(sql);
-            pst.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-    
-    /***
-     * <h1>Pesquisar os dados no banco.</h1>
-     * 
-     * <p>Pesquisa todos os dados do {@link Anuncio} no banco de dados</p>
-     * @author Henrique
-     */
-    public static void procurarDados() {
-        String sql = "select nome 'Nome', cliente 'Cliente', data_inicio 'Data Início', data_fim 'Data Fim', investimento_dia 'Valor Investimento' from anuncios";
-        try {
-            pst = conexao.prepareStatement(sql);
-            rs = pst.executeQuery();
-            
-            tblAnuncios.setModel(DbUtils.resultSetToTableModel(rs));
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
+    Connection conexao;
+    Anuncio anuncio = new Anuncio();
     public CadastroAnuncio() {
         initComponents();
         conexao = Dao.conector();
-        procurarDados();
+        Dao.procurarDados();
     }
 
     @SuppressWarnings("unchecked")
@@ -73,10 +31,13 @@ public class CadastroAnuncio extends javax.swing.JFrame {
         txtInvestimentoDia = new javax.swing.JTextField();
         btnCadastrar = new javax.swing.JButton();
         lblMensagemErro = new javax.swing.JLabel();
+        btnBuscarCliente = new javax.swing.JButton();
+        btnBuscarData = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Cadastro de Anúncio");
         setBackground(new java.awt.Color(255, 255, 255));
+        setMinimumSize(new java.awt.Dimension(600, 500));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -102,6 +63,11 @@ public class CadastroAnuncio extends javax.swing.JFrame {
 
         txtCliente.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         txtCliente.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(30, 215, 96), 3, true), "Cliente", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Calibri Light", 1, 18))); // NOI18N
+        txtCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtClienteActionPerformed(evt);
+            }
+        });
 
         txtDataInicio.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(30, 215, 96), 3, true), "Data de Início", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Calibri Light", 1, 18))); // NOI18N
         try {
@@ -144,48 +110,101 @@ public class CadastroAnuncio extends javax.swing.JFrame {
         lblMensagemErro.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         lblMensagemErro.setForeground(new java.awt.Color(255, 0, 51));
 
+        btnBuscarCliente.setBackground(new java.awt.Color(255, 255, 255));
+        btnBuscarCliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/henrique/anuncio/image/loupe.png"))); // NOI18N
+        btnBuscarCliente.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(30, 215, 96), 2, true));
+        btnBuscarCliente.setBorderPainted(false);
+        btnBuscarCliente.setFocusPainted(false);
+        btnBuscarCliente.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnBuscarClienteMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnBuscarClienteMouseExited(evt);
+            }
+        });
+        btnBuscarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarClienteActionPerformed(evt);
+            }
+        });
+
+        btnBuscarData.setBackground(new java.awt.Color(255, 255, 255));
+        btnBuscarData.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/henrique/anuncio/image/loupe.png"))); // NOI18N
+        btnBuscarData.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(30, 215, 96), 2, true));
+        btnBuscarData.setBorderPainted(false);
+        btnBuscarData.setFocusPainted(false);
+        btnBuscarData.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnBuscarDataMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnBuscarDataMouseExited(evt);
+            }
+        });
+        btnBuscarData.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarDataActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1)
+            .addComponent(lblCadastroAnuncio, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtInvestimentoDia)
-                    .addComponent(txtNome)
-                    .addComponent(txtCliente)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtDataInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtDataInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtDataFim, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDataFim))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(lblMensagemErro, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 228, Short.MAX_VALUE)
-                        .addComponent(btnCadastrar, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-            .addComponent(lblCadastroAnuncio, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnBuscarData, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(249, 249, 249))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtInvestimentoDia)
+                            .addComponent(txtNome)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(lblMensagemErro, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnCadastrar, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(txtCliente)
+                                .addGap(6, 6, 6)
+                                .addComponent(btnBuscarCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(lblCadastroAnuncio)
-                .addGap(44, 44, 44)
-                .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtDataInicio, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
-                    .addComponent(txtDataFim))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblCadastroAnuncio)
+                        .addGap(10, 10, 10)
+                        .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(txtCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnBuscarCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtDataFim, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtDataInicio))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(btnBuscarData, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(10, 10, 10)
                 .addComponent(txtInvestimentoDia, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnCadastrar, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnCadastrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblMensagemErro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -206,16 +225,16 @@ public class CadastroAnuncio extends javax.swing.JFrame {
 //-------------------------------Btn cadastrar----------------------------------
     private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed
         Integer diaInicio, mesInicio, anoInicio, diaFim, mesFim, anoFim;
-        Boolean verificaDataInicio = false, verificaDataFim = false;
+        Boolean verificaDataInicio = false, verificaDataFim = false, verificaInvestimento = false;
 
-        if (txtNome.getText().isEmpty()) {
+        if (txtNome.getText().trim().isEmpty()) {
             lblMensagemErro.setText("Campos ou datas inválidas.");
         } else {
             anuncio.setNome(txtNome.getText());
             lblMensagemErro.setText("");
         }
 
-        if (txtCliente.getText().isEmpty()) {
+        if (txtCliente.getText().trim().isEmpty()) {
             lblMensagemErro.setText("Campos ou datas inválidas.");
         } else {
             anuncio.setCliente(txtCliente.getText());
@@ -258,22 +277,24 @@ public class CadastroAnuncio extends javax.swing.JFrame {
             }
         }
 
-        if (txtInvestimentoDia.getText().isEmpty()) {
+        if (txtInvestimentoDia.getText().trim().isEmpty()) {
             lblMensagemErro.setText("Campos ou datas inválidas.");
         } else {
             try {
                 double investimentoDia = Double.parseDouble(txtInvestimentoDia.getText());
                 anuncio.setInvestimentoDia(investimentoDia);
+                verificaInvestimento = true;
                 lblMensagemErro.setText("");
             } catch (NumberFormatException e) {
                 lblMensagemErro.setText("Campos ou datas inválidas.");
+                verificaInvestimento = false;
             }
         }
         
-        if(txtNome.getText().isEmpty() || txtCliente.getText().isEmpty() || verificaDataInicio == false || verificaDataFim == false || txtInvestimentoDia.getText().isEmpty()){
+        if(txtNome.getText().isEmpty() || txtCliente.getText().isEmpty() || verificaDataInicio == false || verificaDataFim == false || verificaInvestimento == false){
         } else {
-            inserirDados();
-            procurarDados();
+            Dao.inserirDados(anuncio);
+            Dao.procurarDados();
         }
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
@@ -288,6 +309,79 @@ public class CadastroAnuncio extends javax.swing.JFrame {
         btnCadastrar.setFont(new java.awt.Font("Calibri", 0, 18));
         btnCadastrar.setForeground(Color.white);
     }//GEN-LAST:event_btnCadastrarMouseExited
+    //--------------------------------------------------------------------------
+    private void btnBuscarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarClienteActionPerformed
+        if (txtCliente.getText().trim().isEmpty()) {
+            lblMensagemErro.setText("Campo inválido.");
+        } else {
+            anuncio.setCliente(txtCliente.getText());
+            Dao.pesquisarCliente(anuncio);
+            lblMensagemErro.setText("");
+        }
+    }//GEN-LAST:event_btnBuscarClienteActionPerformed
+
+    private void btnBuscarClienteMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBuscarClienteMouseEntered
+        btnBuscarCliente.setBackground(new Color(30, 215, 96));
+    }//GEN-LAST:event_btnBuscarClienteMouseEntered
+
+    private void btnBuscarClienteMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBuscarClienteMouseExited
+        btnBuscarCliente.setBackground(Color.white);
+    }//GEN-LAST:event_btnBuscarClienteMouseExited
+
+    private void txtClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtClienteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtClienteActionPerformed
+    //--------------------------------------------------------------------------
+    private void btnBuscarDataMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBuscarDataMouseEntered
+        btnBuscarData.setBackground(new Color(30, 215, 96));
+    }//GEN-LAST:event_btnBuscarDataMouseEntered
+
+    private void btnBuscarDataMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBuscarDataMouseExited
+        btnBuscarData.setBackground(Color.white);
+    }//GEN-LAST:event_btnBuscarDataMouseExited
+
+    private void btnBuscarDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarDataActionPerformed
+        Integer diaInicio, mesInicio, anoInicio, diaFim, mesFim, anoFim;
+        Boolean verificaDataInicio = false, verificaDataFim = false;
+        
+        if (txtDataInicio.getText().isEmpty()) {
+            lblMensagemErro.setText("Datas inválidas.");
+            verificaDataInicio = false;
+        } else {
+            try{
+                diaInicio = Integer.parseInt(txtDataInicio.getText().substring(0, 2));
+                mesInicio = Integer.parseInt(txtDataInicio.getText().substring(3, 5));
+                anoInicio = Integer.parseInt(txtDataInicio.getText().substring(6, 10));
+                LocalDate dataInicio = LocalDate.of(anoInicio, mesInicio, diaInicio);
+                anuncio.setDataInicio(dataInicio);
+                lblMensagemErro.setText("");
+                verificaDataInicio = true;
+            } catch(NumberFormatException e){
+                lblMensagemErro.setText("Datas inválidas.");
+                verificaDataInicio = false;
+            }
+        }
+        
+        if (txtDataFim.getText().isEmpty()) {
+            lblMensagemErro.setText("Datas inválidas.");
+            verificaDataFim = false;
+        } else {
+            try{
+                diaFim = Integer.parseInt(txtDataFim.getText().substring(0, 2));
+                mesFim = Integer.parseInt(txtDataFim.getText().substring(3, 5));
+                anoFim = Integer.parseInt(txtDataFim.getText().substring(6, 10));
+                LocalDate dataFim = LocalDate.of(anoFim, mesFim, diaFim);
+                anuncio.setDataFim(dataFim);
+                lblMensagemErro.setText("");
+                verificaDataFim = true;
+            } catch(NumberFormatException e){
+                lblMensagemErro.setText("Datas inválidas.");
+                verificaDataFim = false;
+            }
+        }
+        
+        if(verificaDataFim && verificaDataInicio)Dao.pesquisarIntervaloEntreDatas(anuncio);
+    }//GEN-LAST:event_btnBuscarDataActionPerformed
     //--------------------------------------------------------------------------
 
     public static void main(String args[]) {
@@ -320,6 +414,8 @@ public class CadastroAnuncio extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBuscarCliente;
+    private javax.swing.JButton btnBuscarData;
     private javax.swing.JButton btnCadastrar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
