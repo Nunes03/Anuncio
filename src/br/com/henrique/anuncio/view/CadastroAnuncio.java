@@ -1,6 +1,7 @@
 package br.com.henrique.anuncio.view;
 
-import br.com.henrique.anuncio.dao.Dao;
+import br.com.henrique.anuncio.dao.AnuncioDao;
+import br.com.henrique.conexao.Connector;
 import br.com.henrique.anuncio.model.Anuncio;
 import java.awt.Color;
 import java.sql.*;
@@ -12,8 +13,8 @@ public class CadastroAnuncio extends javax.swing.JFrame {
     Anuncio anuncio = new Anuncio();
     public CadastroAnuncio() {
         initComponents();
-        conexao = Dao.conector();
-        Dao.procurarDados();
+        conexao = Connector.conector();
+        AnuncioDao.procurarDados();
     }
 
     @SuppressWarnings("unchecked")
@@ -293,8 +294,8 @@ public class CadastroAnuncio extends javax.swing.JFrame {
         
         if(txtNome.getText().isEmpty() || txtCliente.getText().isEmpty() || verificaDataInicio == false || verificaDataFim == false || verificaInvestimento == false){
         } else {
-            Dao.inserirDados(anuncio);
-            Dao.procurarDados();
+            AnuncioDao.inserirDados(anuncio);
+            AnuncioDao.procurarDados();
         }
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
@@ -315,7 +316,7 @@ public class CadastroAnuncio extends javax.swing.JFrame {
             lblMensagemErro.setText("Campo inválido.");
         } else {
             anuncio.setCliente(txtCliente.getText());
-            Dao.pesquisarCliente(anuncio);
+            AnuncioDao.pesquisarCliente(anuncio);
             lblMensagemErro.setText("");
         }
     }//GEN-LAST:event_btnBuscarClienteActionPerformed
@@ -380,7 +381,7 @@ public class CadastroAnuncio extends javax.swing.JFrame {
             }
         }
         
-        if(verificaDataFim && verificaDataInicio)Dao.pesquisarIntervaloEntreDatas(anuncio);
+        if(verificaDataFim && verificaDataInicio)AnuncioDao.pesquisarIntervaloEntreDatas(anuncio);
     }//GEN-LAST:event_btnBuscarDataActionPerformed
     //--------------------------------------------------------------------------
 
